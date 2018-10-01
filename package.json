@@ -11,9 +11,12 @@
   "author": "treemmett <tregan@tregan.me>",
   "license": "MIT",
   "dependencies": {
+    "allow-methods": "^2.0.0",
     "babel-preset-env": "^1.7.0",
+    "body-parser": "^1.18.3",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
+    "ldapjs": "^1.0.2",
     "mongoose": "^5.3.0"
   },
   "devDependencies": {

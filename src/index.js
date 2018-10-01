@@ -1,3 +1,4 @@
+import bodyparser from 'body-parser';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose, { mongo } from 'mongoose';
@@ -7,6 +8,9 @@ import routes from './routes';
 dotenv.config();
 
 const app = express();
+
+// Parse json from body
+app.use(bodyparser.json());
 
 // Don't crash on unhandles
 app.on('uncaughtException', console.error);
