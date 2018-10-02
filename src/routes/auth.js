@@ -1,6 +1,7 @@
 import allowMethods from 'allow-methods';
 import { Router } from 'express';
 import ldap from 'ldapjs';
+import setToken from '../methods/setToken';
 
 const route = new Router();
 
@@ -98,16 +99,31 @@ route
             // User authentication succeeded. Now check if user has the necessary groups
             const groupRO = new RegExp('^cn='+process.env.LDAP_RO_GROUP, 'i');
             const groupRW = new RegExp('^cn='+process.env.LDAP_RW_GROUP, 'i');
-            const groups = foundObject.memberOf.filter(group => groupRO.test(group) || groupRW.test(group));
+
+            const isAdmin = foundObject.memberOf.find(g => groupRW.test(g));
+            const isUser = foundObject.memberOf.find(g => groupRO.test(g));
 
             // No groups passed the check, this means the user credentials are
             // correct, but user doesn't have permissions
-            if(!groups.length){
+            if(!isAdmin && !isUser){
               res.status(403).send({error: 'You do not have the necessary permissions.'});
               return;
             }
 
-            res.send('Login successful');
+            setToken({
+              username: foundObject.sAMAccountName,
+              admin: !!isAdmin,
+              res
+            }, (err, token) => {
+              if(err){
+                return next(err);
+              }
+
+              res.send({
+                authorization: token,
+                type: 'bearer'
+              });
+            });
           });
         });
       });
